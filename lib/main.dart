@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
     if (status != true) {
       status = false;
     }
+    print(3);
     return status;
   }
 
