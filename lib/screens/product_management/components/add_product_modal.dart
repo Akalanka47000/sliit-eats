@@ -7,25 +7,31 @@ import 'package:sliit_eats/screens/widgets/alert_dialog.dart';
 import 'package:sliit_eats/screens/widgets/entry_field.dart';
 import 'package:sliit_eats/services/category_service.dart';
 
-class AddCategoryModal extends StatefulWidget {
-  const AddCategoryModal({Key? key, required this.modalPurpose, required this.refresh, this.id = '', this.name = '' }) : super(key: key);
+class AddProductModal extends StatefulWidget {
+  const AddProductModal(
+      {Key? key,
+      required this.modalPurpose,
+      required this.refresh,
+      this.id = '',
+      this.name = ''})
+      : super(key: key);
   final ModalPurpose modalPurpose;
   final Function refresh;
   final String id;
   final String name;
 
   @override
-  _AddCategoryModalState createState() => _AddCategoryModalState();
+  _AddProductModalState createState() => _AddProductModalState();
 }
 
-class _AddCategoryModalState extends State<AddCategoryModal> {
+class _AddProductModalState extends State<AddProductModal> {
   final TextEditingController _nameController = TextEditingController();
   dynamic progress;
 
   @override
   void initState() {
     super.initState();
-    if(widget.name != ''){
+    if (widget.name != '') {
       _nameController.text = widget.name;
     }
   }
@@ -39,10 +45,13 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12.0))),
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(12.0))),
       contentPadding: EdgeInsets.zero,
       content: Container(
-        height: MediaQuery.of(context).orientation == Orientation.portrait ? 275 : MediaQuery.of(context).size.height,
+        height: MediaQuery.of(context).orientation == Orientation.portrait
+            ? 400
+            : MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           gradient: LinearGradient(
@@ -66,7 +75,10 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Column(
                     children: [
-                      EntryField(controller: _nameController, placeholder: 'Category Name', isPassword: false),
+                      EntryField(
+                          controller: _nameController,
+                          placeholder: 'Category Name',
+                          isPassword: false),
                       SizedBox(height: 20),
                       GestureDetector(
                         onTap: () async {
@@ -77,18 +89,21 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
                             if (widget.modalPurpose == ModalPurpose.ADD) {
                               res = await CategoryService.addCategory(name);
                             } else {
-                              res = await CategoryService.updateCategory(widget.id, name);
+                              res = await CategoryService.updateCategory(
+                                  widget.id, name);
                             }
                             progress.dismiss();
                             if (res.runtimeType == SuccessMessage) {
-                              await showCoolAlert(context, true, "Category ${widget.modalPurpose == ModalPurpose.ADD ? 'added' : 'updated'} successfully");
+                              await showCoolAlert(context, true,
+                                  "Category ${widget.modalPurpose == ModalPurpose.ADD ? 'added' : 'updated'} successfully");
                               Navigator.of(context).pop();
                               widget.refresh();
                             } else {
                               await showCoolAlert(context, false, res.message);
                             }
                           } else {
-                            await showCoolAlert(context, false, "Please enter a category name");
+                            await showCoolAlert(
+                                context, false, "Please enter a category name");
                           }
                         },
                         child: Container(
@@ -98,7 +113,13 @@ class _AddCategoryModalState extends State<AddCategoryModal> {
                           decoration: BoxDecoration(
                             color: AppColors.primary,
                             borderRadius: BorderRadius.all(Radius.circular(5)),
-                            boxShadow: <BoxShadow>[BoxShadow(color: AppColors.primary.withAlpha(100), offset: Offset(2, 4), blurRadius: 8, spreadRadius: 2)],
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                  color: AppColors.primary.withAlpha(100),
+                                  offset: Offset(2, 4),
+                                  blurRadius: 8,
+                                  spreadRadius: 2)
+                            ],
                           ),
                           child: Text(
                             '${widget.modalPurpose == ModalPurpose.ADD ? 'Add' : 'Update'} Category',

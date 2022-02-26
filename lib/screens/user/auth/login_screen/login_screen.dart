@@ -96,7 +96,6 @@ class _LoginState extends State<Login> {
                             dynamic res = await AuthService.signIn(email, password);
                             progress.dismiss();
                             if (res.runtimeType == SuccessMessage) {
-                              print('sdf');
                               Navigator.pushReplacementNamed(context, AppRoutes.HOME, arguments: {'selectedTabIndex': 0});
                             } else {
                               await showCoolAlert(context, false, res.message);
@@ -145,8 +144,7 @@ class _LoginState extends State<Login> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushReplacementNamed(
-                                    context, AppRoutes.SIGNUP);
+                                Navigator.pushReplacementNamed(context, AppRoutes.SIGNUP);
                               },
                               child: Text(
                                 'Sign Up',

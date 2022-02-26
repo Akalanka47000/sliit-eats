@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_progress_hud/flutter_progress_hud.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:sliit_eats/helpers/colors.dart';
+import 'package:sliit_eats/models/general/sucess_message.dart';
+import 'package:sliit_eats/screens/widgets/alert_dialog.dart';
+import 'package:sliit_eats/services/order_service.dart';
 
 class ProductOrderModal extends StatefulWidget {
-  const ProductOrderModal({Key? key, required this.name, required this.price}) : super(key: key);
+  const ProductOrderModal({Key? key, required this.productId, required this.name, required this.price, required this.unitsLeft}) : super(key: key);
+  final String productId;
   final String name;
   final double price;
+  final int unitsLeft;
 
   @override
   _ProductOrderModalState createState() => _ProductOrderModalState();
@@ -24,6 +29,17 @@ class _ProductOrderModalState extends State<ProductOrderModal> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  void updateQuantity(bool increment) {
+    if (increment && quantity < widget.unitsLeft)
+      setState(() {
+        quantity++;
+      });
+    else if (!increment && quantity > 1)
+      setState(() {
+        quantity--;
+      });
   }
 
   @override
@@ -71,9 +87,7 @@ class _ProductOrderModalState extends State<ProductOrderModal> {
                         children: [
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                quantity--;
-                              });
+                              updateQuantity(false);
                             },
                             child: Icon(
                               FontAwesomeIcons.minusCircle,
@@ -92,9 +106,7 @@ class _ProductOrderModalState extends State<ProductOrderModal> {
                           SizedBox(width: 20),
                           GestureDetector(
                             onTap: () {
-                              setState(() {
-                                quantity++;
-                              });
+                              updateQuantity(true);
                             },
                             child: Icon(
                               FontAwesomeIcons.plusCircle,
@@ -105,7 +117,20 @@ class _ProductOrderModalState extends State<ProductOrderModal> {
                       ),
                       SizedBox(height: 20),
                       GestureDetector(
-                        onTap: () async {},
+                        onTap: () async {
+                          dynamic res = await OrderService.create(widget.productId, quantity);
+                          if (res is SuccessMessage) {
+                            Navigator.pop(context);
+                            await showCoolAlert(context, true, res.message);
+                          } else {
+                            await showCoolAlert(
+                              context,
+                              false,
+                              res.message,
+                              noAutoClose: true,
+                            );
+                          }
+                        },
                         child: Container(
                           width: MediaQuery.of(context).size.width,
                           padding: EdgeInsets.fromLTRB(0, 8, 0, 8),

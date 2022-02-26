@@ -59,14 +59,15 @@ class _CategoryManagementState extends State<CategoryManagement> {
                 future: CategoryService.getCategories(),
                 builder: (BuildContext context, AsyncSnapshot<List<Category>> snapshot) {
                   if (snapshot.hasData) {
-                    if (snapshot.data!.isNotEmpty) {
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        child: ListView.builder(
-                          itemCount: snapshot.data!.length + 1,
-                          itemBuilder: (BuildContext context, int index) {
-                            if (index == 0) {
-                              return Row(
+                    return Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      child: ListView.builder(
+                        itemCount: snapshot.data!.isEmpty ? 2 : (snapshot.data!.length + 1),
+                        itemBuilder: (BuildContext context, int index) {
+                          if (index == 0) {
+                            return Container(
+                              height: 80,
+                              child: Row(
                                 mainAxisAlignment: MainAxisAlignment.end,
                                 children: [
                                   Spacer(),
@@ -88,8 +89,10 @@ class _CategoryManagementState extends State<CategoryManagement> {
                                     ),
                                   ),
                                 ],
-                              );
-                            } else {
+                              ),
+                            );
+                          } else {
+                            if (snapshot.data!.isNotEmpty) {
                               return AnimatedContainer(
                                 duration: Duration(milliseconds: 200),
                                 width: MediaQuery.of(context).size.width,
@@ -159,16 +162,20 @@ class _CategoryManagementState extends State<CategoryManagement> {
                                         ),
                                       ),
                                       GestureDetector(
-                                        onTap: () async {
-                                          progress!.show();
-                                          dynamic res = await CategoryService.deleteCategory(snapshot.data![index - 1].id);
-                                          progress.dismiss();
-                                          if (res.runtimeType == SuccessMessage) {
-                                            await showCoolAlert(context, true, "Category deleted successfully");
-                                            _refresh();
-                                          } else {
-                                            await showCoolAlert(context, false, res.message);
-                                          }
+                                        onTap: () {
+                                          showConfirmDialog(context, () async {
+                                            progress!.show();
+                                            dynamic res = await CategoryService.deleteCategory(snapshot.data![index - 1].id);
+                                            progress.dismiss();
+                                            if (res.runtimeType == SuccessMessage) {
+                                              Navigator.pop(context);
+                                              await showCoolAlert(context, true, "Category deleted successfully");
+                                              _refresh();
+                                            } else {
+                                              Navigator.pop(context);
+                                              await showCoolAlert(context, false, res.message, noAutoClose: true);
+                                            }
+                                          });
                                         },
                                         child: Container(
                                           decoration: BoxDecoration(
@@ -195,13 +202,16 @@ class _CategoryManagementState extends State<CategoryManagement> {
                                   ),
                                 ),
                               );
+                            } else {
+                              return Container(
+                                height: MediaQuery.of(context).size.height - Scaffold.of(context).appBarMaxHeight! - 80,
+                                child: NoDataComponent(),
+                              );
                             }
-                          },
-                        ),
-                      );
-                    } else {
-                      return NoDataComponent();
-                    }
+                          }
+                        },
+                      ),
+                    );
                   } else {
                     return LoadingIndicator();
                   }

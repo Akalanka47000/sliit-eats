@@ -28,7 +28,7 @@ class _OrderManagementState extends State<OrderManagement> {
           ),
         ),
         child: OrderList(isAdminView: true, filters: [
-          {'name': 'completed', 'value': args['completed']}
+          {'name': 'status', 'value': args['status']}
         ]),
       ),
     );
